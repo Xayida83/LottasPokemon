@@ -120,9 +120,9 @@ let displayPokemon = (pokemon) => {
         <ul>
           <li id="hp-${pokemon.id}">HP: ${pokemon.stats.hp}</li>
           <li id="attack-${pokemon.id}">Attack: ${pokemon.stats.attack}</li>
-          <li id="special-attack-${pokemon.id}">Special Attack: ${pokemon.stats.specialAttack}</li>
+          <li id="specialAttack-${pokemon.id}">Special Attack: ${pokemon.stats.specialAttack}</li>
           <li id="defense-${pokemon.id}">Defense: ${pokemon.stats.defense}</li>
-          <li id="special-defense-${pokemon.id}">Special Defense: ${pokemon.stats.specialDefense}</li>
+          <li id="specialDefense-${pokemon.id}">Special Defense: ${pokemon.stats.specialDefense}</li>
           <li id="speed-${pokemon.id}">Speed: ${pokemon.stats.speed}</li>
         </ul>  
       </div>
