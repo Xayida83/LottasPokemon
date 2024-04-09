@@ -1,5 +1,6 @@
 class Pokemon {
-  constructor(name, imageUrl, types, weight, height, stats) {
+  constructor(id, name, imageUrl, types, weight, height, stats) {
+    this.id = id;
     this.name = name;
     this.imageUrl = imageUrl;
     this.types = types;
@@ -27,6 +28,7 @@ let getData = async (url) => {
 
 let createPokemon = (data) => {
   return new Pokemon(
+    data.id,
     data.name,
     data.sprites.other['showdown'].front_default,
     data.types.map(typeInfo => typeInfo.type.name),
@@ -99,6 +101,8 @@ const cardContainer = document.querySelector(".card-container");
 let displayPokemon = (pokemon) => {
   const card = document.createElement('div');
   card.classList.add('pokemon-card');
+  card.id = `pokemon-card-${pokemon.id}`;
+  // card.setAttribute('data-pokemon-id', pokemon.id);
 
   card.innerHTML = `
   <div class='image-container'>
@@ -108,18 +112,18 @@ let displayPokemon = (pokemon) => {
       <h2>${pokemon.name}</h2>
       <div class="info">
         <p>${pokemon.types.join(', ')}</p>
-        <p>Weight: ${pokemon.weight}</p>
-        <p>Height: ${pokemon.height}</p>
+        <p id="weight-${pokemon.id}">Weight: ${pokemon.weight}</p>
+        <p id="height-${pokemon.id}">Height: ${pokemon.height}</p>
       </div>
       <div class="stats">
         <h3>Stats:</h3>
         <ul>
-          <li>HP: ${pokemon.stats.hp}</li>
-          <li>Attack: ${pokemon.stats.attack}</li>
-          <li>Special Attack: ${pokemon.stats.specialAttack}</li>
-          <li>Defense: ${pokemon.stats.defense}</li>
-          <li>Special Defense: ${pokemon.stats.specialDefense}</li>
-          <li>Speed: ${pokemon.stats.speed}</li>
+          <li id="hp-${pokemon.id}">HP: ${pokemon.stats.hp}</li>
+          <li id="attack-${pokemon.id}">Attack: ${pokemon.stats.attack}</li>
+          <li id="special-attack-${pokemon.id}">Special Attack: ${pokemon.stats.specialAttack}</li>
+          <li id="defense-${pokemon.id}">Defense: ${pokemon.stats.defense}</li>
+          <li id="special-defense-${pokemon.id}">Special Defense: ${pokemon.stats.specialDefense}</li>
+          <li id="speed-${pokemon.id}">Speed: ${pokemon.stats.speed}</li>
         </ul>  
       </div>
     </div>
@@ -140,19 +144,22 @@ let displayPokemon = (pokemon) => {
 let comparePokemons = (pokemon1, pokemon2) => {
   const categories = ['weight', 'height', ...Object.keys(pokemon1.stats)];
   //saving weight and height in an array. then with the spread-operatorn add the stats from the object
-  let wins = { pokemon1: 0, pokemon2: 0 };
-  //counts number of wins on each pokemon
+  let results = {};
+
   categories.forEach(category => {
-    if (category in pokemon1.stats) {
-      if (pokemon1.stats[category] > pokemon2.stats[category]) wins.pokemon1++;
-      else if (pokemon1.stats[category] < pokemon2.stats[category]) wins.pokemon2++;
+    let value1 = category in pokemon1.stats ? pokemon1.stats[category] : pokemon1[category];
+    let value2 = category in pokemon2.stats ? pokemon2.stats[category] : pokemon2[category];
+    
+    if (value1 > value2) {
+      results[category] = 'pokemon1';
+    } else if (value1 < value2) {
+      results[category] = 'pokemon2';
     } else {
-      if (pokemon1[category] > pokemon2[category]) wins.pokemon1++;
-      else if (pokemon1[category] < pokemon2[category]) wins.pokemon2++;
+      results[category] = 'tie';
     }
   });
 
-  return wins;
+  return results;
 }
 
 let renderComparison = (pokemon1, pokemon2) => {
@@ -161,16 +168,35 @@ let renderComparison = (pokemon1, pokemon2) => {
 
   comparisonContainer.innerHTML = '';
 
-  const resultText = document.createElement('p');
-  if (comparisonResult.pokemon1 > comparisonResult.pokemon2) {
-    resultText.textContent = `${pokemon1.name} wins in most categories`;
-
-  } else if (comparisonResult.pokemon1 < comparisonResult.pokemon2) {
-    resultText.textContent = `${pokemon2.name} wins in most categories`;
-
-  } else {
-    resultText.textContent = "It is a tie!";
-  }
-  comparisonContainer.appendChild(resultText);
+    const resultText = document.createElement('p');
+    comparisonContainer.appendChild(resultText);
+  
+    let wins = { pokemon1: 0, pokemon2: 0 };
+  
+    Object.keys(comparisonResult).forEach(category => {
+      const winner = comparisonResult[category];
+      const element1 = document.getElementById(`${category}-${pokemon1.id}`);
+      const element2 = document.getElementById(`${category}-${pokemon2.id}`);
+  
+      //clear previously assigned classes to restore the appearance
+      if (element1) element1.classList.remove('color');
+      if (element2) element2.classList.remove('color');
+  
+      if (winner === 'pokemon1') {
+        wins.pokemon1++;
+        if (element1) element1.classList.add('color');
+      } else if (winner === 'pokemon2') {
+        wins.pokemon2++;
+        if (element2) element2.classList.add('color');
+      }
+      // Ingen ytterligare åtgärd behövs för 'tie', om du inte vill hantera det speciellt
+    });
+  
+    if (wins.pokemon1 > wins.pokemon2) {
+      resultText.textContent = `${pokemon1.name} wins in most categories`;
+    } else if (wins.pokemon1 < wins.pokemon2) {
+      resultText.textContent = `${pokemon2.name} wins in most categories`;
+    } else {
+      resultText.textContent = "It is a tie!";
+    }
 }
-
