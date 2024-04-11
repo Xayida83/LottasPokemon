@@ -71,8 +71,8 @@ img {
   display: flex;
   width: 100%;
 }
-.remove-btn {
-  width: 67%;
+.btn {
+  width: 8em;
   font-family: 'Times New Roman', Times, serif;
   font-size: 17px;
   font-weight: 600;
@@ -85,8 +85,8 @@ img {
 
 @media (min-width: 800px) {
   .card-container {
-    justify-content: space-between;
-    min-width: 62%;
+    justify-content: space-evenly;
+    min-width: 89em;
   }
   
   #pokemons{

@@ -8,7 +8,32 @@ class Pokemon {
     this.height = height;
     this.stats = stats;
   }
+}
 
+class BattlePokemon extends Pokemon{
+  constructor(data, moves) {
+    super(data.id, data.name, data.imageUrl, data.types, data.weight, data.height, data.stats);
+    this.moves = moves;
+  }
+
+  calculateDamage(opponent) {
+    let move = this.moves[0];
+    let damage = (this.stats.attack + this.stats.specialAttack) -
+                  (opponent.stats.defense + opponent.stats.specialDefense) *0.8;
+    return damage < 10 ? 10 : Math.round(damage); //ensure min damage is 10
+  }
+
+  attack(opponent){
+    const damage = this.calculateDamage(opponent);
+    opponent.stats.hp -= damage;
+    return {
+      attacker: this.name,
+      move,
+      damage,
+      opponentName: opponent.name,
+      remainingHp: opponent.stats.hp
+    };
+  }
 }
 
 let getData = async (url) => {
@@ -45,15 +70,16 @@ let createPokemon = (data) => {
   );
 }
 // Skapa cardContainer och comparisonContainer en gång vid sidans laddning
-const cardContainer = document.createElement("div");
-cardContainer.classList.add("card-container");
-
 const comparisonContainer = document.createElement("div");
 comparisonContainer.classList.add("comparison-container");
 
-// Lägg till comparisonContainer före cardContainer i DOM
-document.body.appendChild(comparisonContainer);
-document.body.appendChild(cardContainer);
+const battleContainer = document.createElement("div");
+battleContainer.classList.add("battle-container");
+
+const cardContainer = document.createElement("div");
+cardContainer.classList.add("card-container");
+
+document.body.append(comparisonContainer, battleContainer, cardContainer );
 
 let selector = document.querySelector("#pokemons");
 //get all the names and show in a dropdown
@@ -98,6 +124,7 @@ let fetchPokemonDetails = async (event) => {
     }   
     if (selectedPokemons.length === 2) {
       renderComparison(selectedPokemons[0], selectedPokemons[1]);
+      renderStartBattle();
     }else {
       comparisonContainer.innerHTML = '';
     }
@@ -138,7 +165,7 @@ let displayPokemon = (pokemon) => {
         </ul>  
       </div>
     </div>
-    <button class="remove-btn">Remove</button>
+    <button class="remove-btn btn">Remove</button>
   `;
 
   const removeBtn = card.querySelector('.remove-btn');
@@ -211,4 +238,20 @@ let renderComparison = (pokemon1, pokemon2) => {
     } else {
       resultText.textContent = "It is a tie!";
     }
+}
+
+let battle = (pokemon1, pokemon2) => {
+
+}
+
+let renderStartBattle = () => {
+  const battleBtn = document.createElement("button");
+  battleBtn.classList.add("battle-btn", "btn");
+  battleBtn.textContent="start battle"
+  battleBtn.addEventListener("click", battle)
+
+  const battleTextWrap = document.createElement("div");
+  battleTextWrap.classList.add("battle-text-wrap")
+
+  battleContainer.append(battleBtn, battleTextWrap);
 }
