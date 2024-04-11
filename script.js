@@ -44,6 +44,16 @@ let createPokemon = (data) => {
     }
   );
 }
+// Skapa cardContainer och comparisonContainer en gång vid sidans laddning
+const cardContainer = document.createElement("div");
+cardContainer.classList.add("card-container");
+
+const comparisonContainer = document.createElement("div");
+comparisonContainer.classList.add("comparison-container");
+
+// Lägg till comparisonContainer före cardContainer i DOM
+document.body.appendChild(comparisonContainer);
+document.body.appendChild(cardContainer);
 
 let selector = document.querySelector("#pokemons");
 //get all the names and show in a dropdown
@@ -88,7 +98,9 @@ let fetchPokemonDetails = async (event) => {
     }   
     if (selectedPokemons.length === 2) {
       renderComparison(selectedPokemons[0], selectedPokemons[1]);
-    } 
+    }else {
+      comparisonContainer.innerHTML = '';
+    }
 
   } catch (error) {
     console.error('An error occurred while retrieving Pokemon data:', error);
@@ -96,7 +108,6 @@ let fetchPokemonDetails = async (event) => {
  
 };
 
-const cardContainer = document.querySelector(".card-container");
 
 let displayPokemon = (pokemon) => {
   const card = document.createElement('div');
@@ -134,6 +145,9 @@ let displayPokemon = (pokemon) => {
   removeBtn.addEventListener('click', () => {
     card.remove(); 
     selectedPokemons = selectedPokemons.filter(p => p.name !== pokemon.name); 
+    if (selectedPokemons.length < 2) {
+      comparisonContainer.innerHTML = ''; 
+    }
   });
 
   cardContainer.appendChild(card);
@@ -164,7 +178,6 @@ let comparePokemons = (pokemon1, pokemon2) => {
 
 let renderComparison = (pokemon1, pokemon2) => {
   const comparisonResult = comparePokemons(pokemon1, pokemon2);
-  const comparisonContainer = document.querySelector(".comparison-container");
 
   comparisonContainer.innerHTML = '';
 
@@ -189,7 +202,6 @@ let renderComparison = (pokemon1, pokemon2) => {
         wins.pokemon2++;
         if (element2) element2.classList.add('color');
       }
-      // Ingen ytterligare åtgärd behövs för 'tie', om du inte vill hantera det speciellt
     });
   
     if (wins.pokemon1 > wins.pokemon2) {
