@@ -22,6 +22,14 @@ p {
   color: antiquewhite;
   margin: 0.5em;
 }
+.btn {
+  width: 8em;
+  font-family: 'Times New Roman', Times, serif;
+  font-size: 17px;
+  font-weight: 600;
+  border: 2px rgb(221, 106, 106) solid;
+  border-radius: 1em;
+}
 #pokemons{
   height: 3em;
   padding: 0.5em;
@@ -42,6 +50,23 @@ p {
     text-transform: uppercase;
   }
 }
+.battle-container {
+  display: flex;
+  flex-direction: column;
+}
+.battle-btn {
+  text-transform: uppercase;
+  width: 14em;
+  background-color: red;
+  align-self: center;
+}
+.battle-text-wrap {
+  background: hsla(215, 48%, 39%);
+  padding: 1em;
+  border-radius: 1em;
+  margin: 0;
+}
+
 .card-container {
   display: flex;
   flex-flow: row wrap;
@@ -71,14 +96,7 @@ img {
   display: flex;
   width: 100%;
 }
-.btn {
-  width: 8em;
-  font-family: 'Times New Roman', Times, serif;
-  font-size: 17px;
-  font-weight: 600;
-  border: 2px rgb(221, 106, 106) solid;
-  border-radius: 1em;
-}
+
 .color {
   color: rgb(224, 236, 45);
 }
@@ -102,5 +120,11 @@ img {
     top: 10em;
     font-size: 24px;
     max-width: 12em;
+  }
+  .battle-container{
+    position: fixed;
+    top: 25em;
+    gap: 1em;
+    max-width: 17em;
   }
 }

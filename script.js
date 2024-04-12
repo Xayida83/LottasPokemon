@@ -11,12 +11,28 @@ class Pokemon {
 }
 
 class BattlePokemon extends Pokemon{
-  constructor(data, moves) {
+  constructor(data) {
     super(data.id, data.name, data.imageUrl, data.types, data.weight, data.height, data.stats);
-    this.moves = moves;
+    this.moves = [];
+  }
+
+  async fetchMoves(){
+    try {
+      const data = await getData(`https://pokeapi.co/api/v2/pokemon/${this.id}`)
+      this.moves = data.moves.slice(0, 10).map(move => move.move.name)
+      if (this.moves.length === 0) {
+        console.error("No moves found for this Pokémon.");
+      }
+    } catch (error) {
+      console.error("Fail to fetch moves:", error);
+    }
   }
 
   calculateDamage(opponent) {
+    if (this.moves.length === 0) {
+      console.error("No moves loaded. Can't attack.");
+      return 0; // Return 0 damage if no moves are loaded.
+    }
     let move = this.moves[0];
     let damage = (this.stats.attack + this.stats.specialAttack) -
                   (opponent.stats.defense + opponent.stats.specialDefense) *0.8;
@@ -24,11 +40,15 @@ class BattlePokemon extends Pokemon{
   }
 
   attack(opponent){
+    if (this.moves.length === 0) {
+      console.error("Attempt to attack without moves. Battle cannot proceed.");
+      return { error: "No moves loaded" };  // Provide an error object in case of failure.
+    }
     const damage = this.calculateDamage(opponent);
     opponent.stats.hp -= damage;
     return {
       attacker: this.name,
-      move,
+      move: this.moves[0],
       damage,
       opponentName: opponent.name,
       remainingHp: opponent.stats.hp
@@ -69,6 +89,8 @@ let createPokemon = (data) => {
     }
   );
 }
+
+
 // Skapa cardContainer och comparisonContainer en gång vid sidans laddning
 const comparisonContainer = document.createElement("div");
 comparisonContainer.classList.add("comparison-container");
@@ -78,6 +100,9 @@ battleContainer.classList.add("battle-container");
 
 const cardContainer = document.createElement("div");
 cardContainer.classList.add("card-container");
+
+const battleTextWrap = document.createElement("div");
+battleTextWrap.classList.add("battle-text-wrap")
 
 document.body.append(comparisonContainer, battleContainer, cardContainer );
 
@@ -165,7 +190,7 @@ let displayPokemon = (pokemon) => {
         </ul>  
       </div>
     </div>
-    <button class="remove-btn btn">Remove</button>
+    <button class="btn remove-btn">Remove</button>
   `;
 
   const removeBtn = card.querySelector('.remove-btn');
@@ -201,6 +226,16 @@ let comparePokemons = (pokemon1, pokemon2) => {
   });
 
   return results;
+}
+let updateBattleLog = (attackResult) => {
+  const logElement = document.createElement('p');
+  logElement.textContent = `${attackResult.attacker} used ${attackResult.move} and did ${attackResult.damage} damage. ${attackResult.opponentName} remaining HP: ${attackResult.remainingHp}`;
+  battleTextWrap.appendChild(logElement); 
+}
+let displayWinner = (winner) => {
+  const winnerElement = document.createElement('p');
+  winnerElement.textContent = `${winner} wins the battle!`;
+  battleTextWrap.appendChild(winnerElement);
 }
 
 let renderComparison = (pokemon1, pokemon2) => {
@@ -240,18 +275,39 @@ let renderComparison = (pokemon1, pokemon2) => {
     }
 }
 
-let battle = (pokemon1, pokemon2) => {
+let battle = async (pokemon1, pokemon2) => {
+  let currentAttacker = pokemon1.stats.speed > pokemon2.stats.speed ? pokemon1 : pokemon2;
+  let currentDefender = currentAttacker ===  pokemon1 ? pokemon2 : pokemon1;
 
+  console.log("attacker: ", currentAttacker);
+  console.log("defender: ", currentDefender);
+
+  while (pokemon1.stats.hp > 0 && pokemon2.stats.hp > 0) {
+    const attackResult = currentAttacker.attack(currentDefender);
+    updateBattleLog(attackResult); //TODO batttle log
+
+    [currentAttacker, currentDefender] = [currentDefender, currentAttacker];
+
+    await new Promise(resolve => setTimeout(resolve, 2000));
+  }
+
+  const winner = pokemon1.stats.hp > 0 ? pokemon1.name : pokemon2.name;
+  displayWinner(winner); //TODO display winner
 }
 
 let renderStartBattle = () => {
   const battleBtn = document.createElement("button");
-  battleBtn.classList.add("battle-btn", "btn");
+  battleBtn.classList.add("btn","battle-btn" );
   battleBtn.textContent="start battle"
-  battleBtn.addEventListener("click", battle)
+  battleBtn.addEventListener("click", async () => {
+    const battlePokemon1 = new BattlePokemon(selectedPokemons[0]);
+    const battlePokemon2 = new BattlePokemon(selectedPokemons[1]);
 
-  const battleTextWrap = document.createElement("div");
-  battleTextWrap.classList.add("battle-text-wrap")
+    await Promise.all([battlePokemon1.fetchMoves(), battlePokemon2.fetchMoves()]);
+
+    battle(battlePokemon1, battlePokemon2)
+  })
 
   battleContainer.append(battleBtn, battleTextWrap);
 }
+
