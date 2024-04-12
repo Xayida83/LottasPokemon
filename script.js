@@ -9,7 +9,6 @@ class Pokemon {
     this.stats = stats;
   }
 }
-
 class BattlePokemon extends Pokemon{
   constructor(data) {
     super(data.id, data.name, data.imageUrl, data.types, data.weight, data.height, data.stats);
@@ -29,11 +28,6 @@ class BattlePokemon extends Pokemon{
   }
 
   calculateDamage(opponent) {
-    if (this.moves.length === 0) {
-      console.error("No moves loaded. Can't attack.");
-      return 0; // Return 0 damage if no moves are loaded.
-    }
-    let move = this.moves[0];
     let damage = (this.stats.attack + this.stats.specialAttack) -
                   (opponent.stats.defense + opponent.stats.specialDefense) *0.8;
     return damage < 10 ? 10 : Math.round(damage); //ensure min damage is 10
@@ -42,7 +36,7 @@ class BattlePokemon extends Pokemon{
   attack(opponent){
     if (this.moves.length === 0) {
       console.error("Attempt to attack without moves. Battle cannot proceed.");
-      return { error: "No moves loaded" };  // Provide an error object in case of failure.
+      return { error: "No moves loaded" };  
     }
     const damage = this.calculateDamage(opponent);
     opponent.stats.hp -= damage;
@@ -160,12 +154,10 @@ let fetchPokemonDetails = async (event) => {
  
 };
 
-
 let displayPokemon = (pokemon) => {
   const card = document.createElement('div');
   card.classList.add('pokemon-card');
   card.id = `pokemon-card-${pokemon.id}`;
-  // card.setAttribute('data-pokemon-id', pokemon.id);
 
   card.innerHTML = `
   <div class='image-container'>
@@ -195,16 +187,18 @@ let displayPokemon = (pokemon) => {
 
   const removeBtn = card.querySelector('.remove-btn');
   removeBtn.addEventListener('click', () => {
-    card.remove(); 
-    selectedPokemons = selectedPokemons.filter(p => p.name !== pokemon.name); 
-    if (selectedPokemons.length < 2) {
-      comparisonContainer.innerHTML = ''; 
-    }
+    card.remove();     
+    selectedPokemons = selectedPokemons.filter(p => p.id !== pokemon.id);
+    console.log("Slected:", selectedPokemons);
+    restartBattle();
+    // if (selectedPokemons.length < 2) {
+    //   // comparisonContainer.innerHTML = ''; // Clear the comparison container
+    //   restartBattle();
+    //   // battleTextWrap.innerHTML = ''; // Clear the battle text wrap
+    //   // battleContainer.innerHTML= ''; // Hide the battle container
+    // }
   });
-
   cardContainer.appendChild(card);
-
-  console.log(pokemon);
 };
 
 let comparePokemons = (pokemon1, pokemon2) => {
@@ -233,14 +227,14 @@ let updateBattleLog = (attackResult) => {
   battleTextWrap.appendChild(logElement); 
 }
 let displayWinner = (winner) => {
-  const winnerElement = document.createElement('p');
+  const winnerElement = document.createElement('h3');
   winnerElement.textContent = `${winner} wins the battle!`;
   battleTextWrap.appendChild(winnerElement);
 }
 
 let renderComparison = (pokemon1, pokemon2) => {
   const comparisonResult = comparePokemons(pokemon1, pokemon2);
-
+  console.log("Slected:", selectedPokemons);
   comparisonContainer.innerHTML = '';
 
     const resultText = document.createElement('p');
@@ -273,6 +267,7 @@ let renderComparison = (pokemon1, pokemon2) => {
     } else {
       resultText.textContent = "It is a tie!";
     }
+  
 }
 
 let battle = async (pokemon1, pokemon2) => {
@@ -282,20 +277,37 @@ let battle = async (pokemon1, pokemon2) => {
   console.log("attacker: ", currentAttacker);
   console.log("defender: ", currentDefender);
 
+  battleTextWrap.innerHTML = '';
+
   while (pokemon1.stats.hp > 0 && pokemon2.stats.hp > 0) {
     const attackResult = currentAttacker.attack(currentDefender);
-    updateBattleLog(attackResult); //TODO batttle log
+    updateBattleLog(attackResult); 
+    updatePokemonRoles(currentAttacker, currentDefender);
+    
+    await new Promise(resolve => setTimeout(resolve, 4000));
+    
+    if (currentDefender.stats.hp <= 0) {
+      displayWinner(currentAttacker.name);
+      break;
+    }
 
-    [currentAttacker, currentDefender] = [currentDefender, currentAttacker];
-
-    await new Promise(resolve => setTimeout(resolve, 2000));
-  }
-
-  const winner = pokemon1.stats.hp > 0 ? pokemon1.name : pokemon2.name;
-  displayWinner(winner); //TODO display winner
+    [currentAttacker, currentDefender] = [currentDefender, currentAttacker];    
+  } 
 }
+let updatePokemonRoles = (attacker, defender) => {
+  const allCards = document.querySelectorAll('.pokemon-card');
+  allCards.forEach(card => {
+    card.classList.remove('attack', 'defend');
+  });
 
+  const attackerCard = document.getElementById(`pokemon-card-${attacker.id}`);
+  const defenderCard = document.getElementById(`pokemon-card-${defender.id}`);
+  attackerCard.classList.add('attack');
+  defenderCard.classList.add('defend');
+}
 let renderStartBattle = () => {
+  // battleTextWrap.innerHTML="";
+  
   const battleBtn = document.createElement("button");
   battleBtn.classList.add("btn","battle-btn" );
   battleBtn.textContent="start battle"
@@ -311,3 +323,12 @@ let renderStartBattle = () => {
   battleContainer.append(battleBtn, battleTextWrap);
 }
 
+let restartBattle = () => {
+  battleTextWrap.innerHTML = ''; // Rensa stridsloggen
+  battleContainer.innerHTML = ''; // Göm stridscontainern
+  comparisonContainer.innerHTML = ''; // Rensa jämförelsevisningar
+  const allCards = document.querySelectorAll('.pokemon-card');
+  allCards.forEach(card => {
+    card.classList.remove('attack', 'defend');
+  });
+ }

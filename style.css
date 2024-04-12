@@ -53,6 +53,7 @@ p {
 .battle-container {
   display: flex;
   flex-direction: column;
+  gap: 1em;
 }
 .battle-btn {
   text-transform: uppercase;
@@ -84,21 +85,34 @@ p {
   padding: 1em;
   width: 12em;
   box-shadow: 0 0 19px 8px rgb(63 81 181 / 46%);
-}
-img {
-  width: 5em;
-  height: 5em;
-  background: rgba(255, 255, 255, 0.144);
-  padding: 2em;
-  border-radius: 1em;
+
+  & img {
+    width: 5em;
+    height: 5em;
+    background: rgba(255, 255, 255, 0.144);
+    padding: 2em;
+    border-radius: 1em;
+  }
 }
 .info {
   display: flex;
   width: 100%;
 }
-
 .color {
   color: rgb(224, 236, 45);
+}
+.attack {
+  border: 2px solid red;
+  background-color: rgba(255, 0, 0, 0.1);
+}
+
+.defend {
+  border: 2px solid blue;
+  background-color: rgba(0, 0, 255, 0.1);
+}
+
+.hide {
+  display: none;
 }
 
 @media (min-width: 800px) {
@@ -124,7 +138,6 @@ img {
   .battle-container{
     position: fixed;
     top: 25em;
-    gap: 1em;
     max-width: 17em;
   }
 }
