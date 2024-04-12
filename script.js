@@ -39,7 +39,7 @@ class BattlePokemon extends Pokemon{
       return { error: "No moves loaded" };  
     }
     const damage = this.calculateDamage(opponent);
-    opponent.stats.hp -= damage;
+    opponent.stats.hp = Math.max(0, opponent.stats.hp - damage);
     return {
       attacker: this.name,
       move: this.moves[0],
@@ -230,6 +230,15 @@ let displayWinner = (winner) => {
   const winnerElement = document.createElement('h3');
   winnerElement.textContent = `${winner} wins the battle!`;
   battleTextWrap.appendChild(winnerElement);
+
+  const resetBtn = document.createElement('button');
+  resetBtn.textContent = "reset";
+  resetBtn.classList.add("btn", "reset-btn");
+  
+  resetBtn.addEventListener('click', () => {
+    location.reload();
+  });
+  battleTextWrap.appendChild(resetBtn);
 }
 
 let renderComparison = (pokemon1, pokemon2) => {

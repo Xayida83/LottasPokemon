@@ -38,6 +38,7 @@ p {
   font-weight: 600;
   border-radius: 1em;
   font-family: 'Times New Roman', Times, serif;
+  font-size: 24px;
 }
 .comparison-container {
   /* background-color: hsla(215, 48%, 39%); */
@@ -53,7 +54,7 @@ p {
 .battle-container {
   display: flex;
   flex-direction: column;
-  gap: 1em;
+  gap: 0.5em;
 }
 .battle-btn {
   text-transform: uppercase;
@@ -62,19 +63,37 @@ p {
   align-self: center;
 }
 .battle-text-wrap {
-  background: hsla(215, 48%, 39%);
-  padding: 1em;
-  border-radius: 1em;
+  /* background: hsla(215, 48%, 39%); */
+  /* padding: 0 1em; */
+  border-radius: 0 1em;
   margin: 0;
+  display: flex;
+  flex-direction: column;
+  
+  & p {
+    background: hsla(215, 48%, 39%);
+    padding: 0.5em;
+    border-radius: 1em 1em 0;
+  }
+  & h3 {
+    background: hsla(215, 48%, 39%);
+    padding: 0.5em;
+    border-radius: 1em 1em;
+    text-align: center;
+  }
 }
+.reset-btn {
+  align-self: center;
+  text-transform: uppercase;
+  margin-top: 0.5em;
 
+}
 .card-container {
   display: flex;
   flex-flow: row wrap;
   gap: 1em;
   justify-content: center;
 }
-
 .pokemon-card {
   display: flex;
   flex-direction: column;
@@ -105,39 +124,36 @@ p {
   border: 2px solid red;
   background-color: rgba(255, 0, 0, 0.1);
 }
-
 .defend {
   border: 2px solid blue;
   background-color: rgba(0, 0, 255, 0.1);
 }
 
-.hide {
-  display: none;
-}
-
 @media (min-width: 800px) {
   .card-container {
     justify-content: space-evenly;
-    min-width: 89em;
-  }
-  
+    min-width: 93em;
+  }  
   #pokemons{
-    height: 4em;
-    padding: 1em;
-    font-size: 20px;
+    height: 3em;
+    padding: 0.5em;
+    font-size: 18px;
     margin: 1em;
   }
 }
 @media (min-width: 1037px) {
   .comparison-container {
     position: fixed;
-    top: 10em;
-    font-size: 24px;
-    max-width: 12em;
+    top: 8em;
+    font-size: 17px;
+    max-width: 23em;
   }
   .battle-container{
     position: fixed;
-    top: 25em;
-    max-width: 17em;
+    top: 13em;
+    max-width: 19em;
+    & p {
+      margin: 0.1em;
+    }
   }
 }
