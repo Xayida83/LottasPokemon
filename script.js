@@ -27,6 +27,14 @@ class BattlePokemon extends Pokemon{
     }
   }
 
+  setRole (role) {
+    const cardElement = document.getElementById(`pokemon-card-${this.id}`);
+    if (cardElement) {
+      cardElement.classList.remove("attack", "defend");
+      cardElement.classList.add(role);
+    }    
+  }
+  
   calculateDamage(opponent) {
     let damage = (this.stats.attack + this.stats.specialAttack) -
                   (opponent.stats.defense + opponent.stats.specialDefense) *0.8;
@@ -84,7 +92,6 @@ let createPokemon = (data) => {
   );
 }
 
-
 // Skapa cardContainer och comparisonContainer en gång vid sidans laddning
 const comparisonContainer = document.createElement("div");
 comparisonContainer.classList.add("comparison-container");
@@ -101,7 +108,7 @@ battleTextWrap.classList.add("battle-text-wrap")
 document.body.append(comparisonContainer, battleContainer, cardContainer );
 
 let selector = document.querySelector("#pokemons");
-//get all the names and show in a dropdown
+
 let renderSelector = async (selector) => {
   try {
     const data = await getData("https://pokeapi.co/api/v2/pokemon?limit=151");
@@ -119,12 +126,12 @@ let renderSelector = async (selector) => {
 
   selector.addEventListener('change', fetchPokemonDetails);
 };
-
 renderSelector(selector);
 
 let selectedPokemons = [];
 
 let fetchPokemonDetails = async (event) => {
+  
   if(selectedPokemons.length >= 2) {
     alert("You can only pic two Pokémons");
     return;
@@ -144,6 +151,7 @@ let fetchPokemonDetails = async (event) => {
     if (selectedPokemons.length === 2) {
       renderComparison(selectedPokemons[0], selectedPokemons[1]);
       renderStartBattle();
+      selector.value = "";
     }else {
       comparisonContainer.innerHTML = '';
     }
@@ -191,12 +199,6 @@ let displayPokemon = (pokemon) => {
     selectedPokemons = selectedPokemons.filter(p => p.id !== pokemon.id);
     console.log("Slected:", selectedPokemons);
     restartBattle();
-    // if (selectedPokemons.length < 2) {
-    //   // comparisonContainer.innerHTML = ''; // Clear the comparison container
-    //   restartBattle();
-    //   // battleTextWrap.innerHTML = ''; // Clear the battle text wrap
-    //   // battleContainer.innerHTML= ''; // Hide the battle container
-    // }
   });
   cardContainer.appendChild(card);
 };
@@ -283,6 +285,9 @@ let battle = async (pokemon1, pokemon2) => {
   let currentAttacker = pokemon1.stats.speed > pokemon2.stats.speed ? pokemon1 : pokemon2;
   let currentDefender = currentAttacker ===  pokemon1 ? pokemon2 : pokemon1;
 
+  currentAttacker.setRole("attack");
+  currentDefender.setRole("defend");
+
   console.log("attacker: ", currentAttacker);
   console.log("defender: ", currentDefender);
 
@@ -291,36 +296,25 @@ let battle = async (pokemon1, pokemon2) => {
   while (pokemon1.stats.hp > 0 && pokemon2.stats.hp > 0) {
     const attackResult = currentAttacker.attack(currentDefender);
     updateBattleLog(attackResult); 
-    updatePokemonRoles(currentAttacker, currentDefender);
     
-    await new Promise(resolve => setTimeout(resolve, 4000));
+    await new Promise(resolve => setTimeout(resolve, 3500));
     
     if (currentDefender.stats.hp <= 0) {
       displayWinner(currentAttacker.name);
       break;
     }
 
-    [currentAttacker, currentDefender] = [currentDefender, currentAttacker];    
+    [currentAttacker, currentDefender] = [currentDefender, currentAttacker];
+    currentAttacker.setRole("attack");
+    currentDefender.setRole("defend");    
   } 
 }
-let updatePokemonRoles = (attacker, defender) => {
-  const allCards = document.querySelectorAll('.pokemon-card');
-  allCards.forEach(card => {
-    card.classList.remove('attack', 'defend');
-  });
-
-  const attackerCard = document.getElementById(`pokemon-card-${attacker.id}`);
-  const defenderCard = document.getElementById(`pokemon-card-${defender.id}`);
-  attackerCard.classList.add('attack');
-  defenderCard.classList.add('defend');
-}
 let renderStartBattle = () => {
-  // battleTextWrap.innerHTML="";
-  
   const battleBtn = document.createElement("button");
   battleBtn.classList.add("btn","battle-btn" );
   battleBtn.textContent="start battle"
-  battleBtn.addEventListener("click", async () => {
+  
+  battleBtn.addEventListener("click", async () => {    
     const battlePokemon1 = new BattlePokemon(selectedPokemons[0]);
     const battlePokemon2 = new BattlePokemon(selectedPokemons[1]);
 
@@ -333,9 +327,9 @@ let renderStartBattle = () => {
 }
 
 let restartBattle = () => {
-  battleTextWrap.innerHTML = ''; // Rensa stridsloggen
-  battleContainer.innerHTML = ''; // Göm stridscontainern
-  comparisonContainer.innerHTML = ''; // Rensa jämförelsevisningar
+  battleTextWrap.innerHTML = ''; 
+  battleContainer.innerHTML = ''; 
+  comparisonContainer.innerHTML = ''; 
   const allCards = document.querySelectorAll('.pokemon-card');
   allCards.forEach(card => {
     card.classList.remove('attack', 'defend');

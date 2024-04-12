@@ -141,7 +141,7 @@ p {
     margin: 1em;
   }
 }
-@media (min-width: 1037px) {
+@media (min-width: 1000px) {
   .comparison-container {
     position: fixed;
     top: 8em;
