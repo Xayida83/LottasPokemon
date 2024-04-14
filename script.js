@@ -36,21 +36,26 @@ class BattlePokemon extends Pokemon{
   }
   
   calculateDamage(opponent) {
+    if (this.moves.length === 0) {
+      console.error("No moves loaded. Cannot proceed with the attack.");
+      return 0; 
+    }
+    let randomIndex = Math.floor(Math.random() * this.moves.length);
+    let selectedMove = this.moves[randomIndex];
     let damage = (this.stats.attack + this.stats.specialAttack) -
                   (opponent.stats.defense + opponent.stats.specialDefense) *0.8;
-    return damage < 10 ? 10 : Math.round(damage); //ensure min damage is 10
+    return {
+      move: selectedMove,
+      damage: damage < 10 ? 10 : Math.round(damage) //Ensure damage is min 10
+    };
   }
 
-  attack(opponent){
-    if (this.moves.length === 0) {
-      console.error("Attempt to attack without moves. Battle cannot proceed.");
-      return { error: "No moves loaded" };  
-    }
-    const damage = this.calculateDamage(opponent);
+  attack(opponent) {
+    const { move, damage } = this.calculateDamage(opponent);
     opponent.stats.hp = Math.max(0, opponent.stats.hp - damage);
     return {
       attacker: this.name,
-      move: this.moves[0],
+      move,
       damage,
       opponentName: opponent.name,
       remainingHp: opponent.stats.hp
@@ -266,13 +271,42 @@ let displayPokemon = (pokemon) => {
   cardContainer.appendChild(card);
 };
 
+// let updateBattleLog = (attackResult) => {
+//   const logElement = document.createElement('p');
+//   logElement.classList.add("battle-log");
+//   let attackerName = attackResult.attacker.toUpperCase();
+//   let attackMove = attackResult.move.toUpperCase();
+//   logElement.textContent = `${attackerName} used ${attackMove} and did ${attackResult.damage} damage. ${attackResult.opponentName} remaining HP: ${attackResult.remainingHp}`;
+//   battleTextWrap.appendChild(logElement); 
+// }
+
 let updateBattleLog = (attackResult) => {
   const logElement = document.createElement('p');
   logElement.classList.add("battle-log");
-  let attackerName = attackResult.attacker.toUpperCase();
-  logElement.textContent = `${attackerName} used ${attackResult.move} and did ${attackResult.damage} damage. ${attackResult.opponentName} remaining HP: ${attackResult.remainingHp}`;
-  battleTextWrap.appendChild(logElement); 
+
+  const logParts = [
+      { text: attackResult.attacker, class: "attacker-name" },
+      { text: "used", class: "text-normal" },
+      { text: attackResult.move, class: "attack-move" },
+      { text: "and did", class: "text-normal" },
+      { text: `${attackResult.damage}`, class: "damage-info" },
+      { text: "damage.", class: "text-normal" },
+      { text: attackResult.opponentName, class: "opponent-name" },
+      { text: "remaining", class: "text-normal" },
+      { text: `HP: ${attackResult.remainingHp}`, class: "remaining-hp" }
+  ];
+
+  logParts.forEach(part => {
+      const span = document.createElement('span');
+      span.textContent = part.text;
+      span.classList.add(part.class);
+      logElement.appendChild(span);
+      logElement.appendChild(document.createTextNode(" ")); // Lägg till ett mellanslag efter varje span
+  });
+
+  battleTextWrap.appendChild(logElement);
 }
+
 let displayWinner = (winner) => {
   const winnerElement = document.createElement('h3');
   winnerElement.classList.add("winner-log");

@@ -63,24 +63,37 @@ p {
   align-self: center;
 }
 .battle-text-wrap {
-  /* background: hsla(215, 48%, 39%); */
-  /* padding: 0 1em; */
   border-radius: 0 1em;
   margin: 0;
   display: flex;
   flex-direction: column;
-  
+
   & h3 {
     background: hsla(215, 48%, 39%);
     padding: 0.5em;
     border-radius: 1em 1em;
     text-align: center;
+    color: #ffeb3b;
   }
 }
 .battle-log {
   background: hsla(215, 48%, 39%);
   padding: 0.5em;
   border-radius: 1em 1em 0;
+  text-transform: math-auto;
+}
+.attacker-name{
+  text-transform: uppercase;
+  color: #f5c832;
+  font-weight: 600;
+}
+.attack-move{
+  text-transform: uppercase;
+  color: #acef6a;
+}
+.opponent-name {
+  text-transform: uppercase;
+  color: #62ece1;
 }
 .reset-btn {
   align-self: center;
@@ -132,7 +145,8 @@ p {
 @media (min-width: 800px) {
   .card-container {
     justify-content: space-evenly;
-    min-width: 93em;
+    /* min-width: 93em; */
+    min-width: 100%;
   }  
   #pokemons{
     height: 3em;
@@ -140,20 +154,31 @@ p {
     font-size: 18px;
     margin: 1em;
   }
+  .winner-log{
+    text-shadow: 1px 7px black;
+    font-size: 30px;
+  }
 }
 @media (min-width: 1000px) {
   .comparison-container {
     position: fixed;
     top: 8em;
-    font-size: 17px;
+    font-size: 18px;
     max-width: 23em;
   }
   .battle-container{
     position: fixed;
     top: 13em;
-    max-width: 19em;
+    overflow-y: auto;
+    max-width: 22%;
+    max-height: 70%;
+    margin-top: 1em ;
     & p {
       margin: 0.1em;
+      font-size: 18px;
     }
+  }
+  .battle-container::-webkit-scrollbar {
+    width: 15%;
   }
 }
