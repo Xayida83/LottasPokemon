@@ -57,7 +57,7 @@ class BattlePokemon extends Pokemon{
     };
   }
 }
-
+//Get API data
 let getData = async (url) => {
   try {
     let response = await fetch(url);
@@ -72,7 +72,7 @@ let getData = async (url) => {
     console.error(error);
   }
 }
-
+//Create object
 let createPokemon = (data) => {
   return new Pokemon(
     data.id,
@@ -92,7 +92,7 @@ let createPokemon = (data) => {
   );
 }
 
-// Skapa cardContainer och comparisonContainer en gång vid sidans laddning
+//Create Containers showing at loding document
 const comparisonContainer = document.createElement("div");
 comparisonContainer.classList.add("comparison-container");
 
@@ -107,8 +107,8 @@ battleTextWrap.classList.add("battle-text-wrap")
 
 document.body.append(comparisonContainer, battleContainer, cardContainer );
 
+//Fill the selector whit names from api
 let selector = document.querySelector("#pokemons");
-
 let renderSelector = async (selector) => {
   try {
     const data = await getData("https://pokeapi.co/api/v2/pokemon?limit=151");
@@ -123,13 +123,14 @@ let renderSelector = async (selector) => {
   } catch (error) {
     console.error("OBS!", error);
   }  
-
+  //Use the funtion to get details from API when change on selector
   selector.addEventListener('change', fetchPokemonDetails);
 };
 renderSelector(selector);
 
+//An array to collect selected name from the selector
 let selectedPokemons = [];
-
+//Event on selector 
 let fetchPokemonDetails = async (event) => {
   
   if(selectedPokemons.length >= 2) {
@@ -142,25 +143,87 @@ let fetchPokemonDetails = async (event) => {
     const data = await getData(url);
     const pokemon = createPokemon(data);
 
+    //Check if the pokemon already has been picked, show and push to array selectedPokemons 
     if (!selectedPokemons.find(p => p.name === pokemon.name)) {
       displayPokemon(pokemon);
       selectedPokemons.push(pokemon);
+      if (selectedPokemons.length === 2) {
+        renderComparison(selectedPokemons[0], selectedPokemons[1]);
+        renderStartBattle();      
+      }
     } else {
       alert(`${pokemon.name} has already been selected`)
     }   
-    if (selectedPokemons.length === 2) {
-      renderComparison(selectedPokemons[0], selectedPokemons[1]);
-      renderStartBattle();
-      selector.value = "";
-    }else {
-      comparisonContainer.innerHTML = '';
-    }
-
+    //Check if the pokemons are two and call funktion to compare them and able to start a battle
+    
   } catch (error) {
     console.error('An error occurred while retrieving Pokemon data:', error);
-  }
- 
+  } 
+  // Resets the select element to the default value
+  selector.value = "";
 };
+
+let renderComparison = (pokemon1, pokemon2) => {
+  const comparisonResult = comparePokemons(pokemon1, pokemon2);
+  console.log("Selected:", selectedPokemons);
+  // Empty content from before
+  comparisonContainer.innerHTML = '';
+
+  const resultText = document.createElement('p');
+  comparisonContainer.appendChild(resultText);
+  
+  let wins = { pokemon1: 0, pokemon2: 0 };
+  
+  Object.keys(comparisonResult).forEach(category => {
+    const winner = comparisonResult[category];
+    const element1 = document.getElementById(`${category}-${pokemon1.id}`);
+    const element2 = document.getElementById(`${category}-${pokemon2.id}`);
+  
+    //Clear previous color of winning stats
+    if (element1) element1.classList.remove('color');
+    if (element2) element2.classList.remove('color');
+  
+    if (winner === 'pokemon1') {
+      wins.pokemon1++;
+      if (element1) element1.classList.add('color');
+    } else if (winner === 'pokemon2') {
+      wins.pokemon2++;
+      if (element2) element2.classList.add('color');
+    }
+  });
+  
+    if (wins.pokemon1 > wins.pokemon2) {
+      resultText.textContent = `${pokemon1.name} wins in most categories`;
+    } else if (wins.pokemon1 < wins.pokemon2) {
+      resultText.textContent = `${pokemon2.name} wins in most categories`;
+    } else {
+      resultText.textContent = "It is a tie!";
+    }  
+}
+//Compare the selected pokemons
+let comparePokemons = (pokemon1, pokemon2) => {
+  //Saving weight and height in an array. Then with the spread-operatorn add the stats from the object
+  const categories = ['weight', 'height', ...Object.keys(pokemon1.stats)];
+  //A "results" object is created to store the result of the comparisons for each category
+  let results = {};
+  //By using the category names as keys in the results object, you can easily and directly retrieve the results for a specific comparison category. For example by referencing results['speed'].
+
+  categories.forEach(category => {
+    //if the value is in stats put value1 otherwise take the value for weght and height which is directly on the object and put as value1
+    let value1 = category in pokemon1.stats ? pokemon1.stats[category] : pokemon1[category];
+    let value2 = category in pokemon2.stats ? pokemon2.stats[category] : pokemon2[category];
+    //Compare the values
+    if (value1 > value2) {
+      results[category] = 'pokemon1';
+    } else if (value1 < value2) {
+      results[category] = 'pokemon2';
+    } else {
+      results[category] = 'tie';
+    }
+  });
+
+  return results;
+}
 
 let displayPokemon = (pokemon) => {
   const card = document.createElement('div');
@@ -203,26 +266,7 @@ let displayPokemon = (pokemon) => {
   cardContainer.appendChild(card);
 };
 
-let comparePokemons = (pokemon1, pokemon2) => {
-  const categories = ['weight', 'height', ...Object.keys(pokemon1.stats)];
-  //saving weight and height in an array. then with the spread-operatorn add the stats from the object
-  let results = {};
 
-  categories.forEach(category => {
-    let value1 = category in pokemon1.stats ? pokemon1.stats[category] : pokemon1[category];
-    let value2 = category in pokemon2.stats ? pokemon2.stats[category] : pokemon2[category];
-    
-    if (value1 > value2) {
-      results[category] = 'pokemon1';
-    } else if (value1 < value2) {
-      results[category] = 'pokemon2';
-    } else {
-      results[category] = 'tie';
-    }
-  });
-
-  return results;
-}
 let updateBattleLog = (attackResult) => {
   const logElement = document.createElement('p');
   logElement.textContent = `${attackResult.attacker} used ${attackResult.move} and did ${attackResult.damage} damage. ${attackResult.opponentName} remaining HP: ${attackResult.remainingHp}`;
@@ -243,43 +287,7 @@ let displayWinner = (winner) => {
   battleTextWrap.appendChild(resetBtn);
 }
 
-let renderComparison = (pokemon1, pokemon2) => {
-  const comparisonResult = comparePokemons(pokemon1, pokemon2);
-  console.log("Slected:", selectedPokemons);
-  comparisonContainer.innerHTML = '';
 
-    const resultText = document.createElement('p');
-    comparisonContainer.appendChild(resultText);
-  
-    let wins = { pokemon1: 0, pokemon2: 0 };
-  
-    Object.keys(comparisonResult).forEach(category => {
-      const winner = comparisonResult[category];
-      const element1 = document.getElementById(`${category}-${pokemon1.id}`);
-      const element2 = document.getElementById(`${category}-${pokemon2.id}`);
-  
-      //clear previously assigned classes to restore the appearance
-      if (element1) element1.classList.remove('color');
-      if (element2) element2.classList.remove('color');
-  
-      if (winner === 'pokemon1') {
-        wins.pokemon1++;
-        if (element1) element1.classList.add('color');
-      } else if (winner === 'pokemon2') {
-        wins.pokemon2++;
-        if (element2) element2.classList.add('color');
-      }
-    });
-  
-    if (wins.pokemon1 > wins.pokemon2) {
-      resultText.textContent = `${pokemon1.name} wins in most categories`;
-    } else if (wins.pokemon1 < wins.pokemon2) {
-      resultText.textContent = `${pokemon2.name} wins in most categories`;
-    } else {
-      resultText.textContent = "It is a tie!";
-    }
-  
-}
 
 let battle = async (pokemon1, pokemon2) => {
   let currentAttacker = pokemon1.stats.speed > pokemon2.stats.speed ? pokemon1 : pokemon2;
