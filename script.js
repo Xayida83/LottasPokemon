@@ -266,14 +266,16 @@ let displayPokemon = (pokemon) => {
   cardContainer.appendChild(card);
 };
 
-
 let updateBattleLog = (attackResult) => {
   const logElement = document.createElement('p');
-  logElement.textContent = `${attackResult.attacker} used ${attackResult.move} and did ${attackResult.damage} damage. ${attackResult.opponentName} remaining HP: ${attackResult.remainingHp}`;
+  logElement.classList.add("battle-log");
+  let attackerName = attackResult.attacker.toUpperCase();
+  logElement.textContent = `${attackerName} used ${attackResult.move} and did ${attackResult.damage} damage. ${attackResult.opponentName} remaining HP: ${attackResult.remainingHp}`;
   battleTextWrap.appendChild(logElement); 
 }
 let displayWinner = (winner) => {
   const winnerElement = document.createElement('h3');
+  winnerElement.classList.add("winner-log");
   winnerElement.textContent = `${winner} wins the battle!`;
   battleTextWrap.appendChild(winnerElement);
 
@@ -287,36 +289,35 @@ let displayWinner = (winner) => {
   battleTextWrap.appendChild(resetBtn);
 }
 
-
-
 let battle = async (pokemon1, pokemon2) => {
+  //See which pokemon starts with an attack
   let currentAttacker = pokemon1.stats.speed > pokemon2.stats.speed ? pokemon1 : pokemon2;
-  let currentDefender = currentAttacker ===  pokemon1 ? pokemon2 : pokemon1;
+  let currentDefender = currentAttacker === pokemon1 ? pokemon2 : pokemon1;
 
   currentAttacker.setRole("attack");
   currentDefender.setRole("defend");
 
-  console.log("attacker: ", currentAttacker);
-  console.log("defender: ", currentDefender);
-
-  battleTextWrap.innerHTML = '';
-
   while (pokemon1.stats.hp > 0 && pokemon2.stats.hp > 0) {
     const attackResult = currentAttacker.attack(currentDefender);
-    updateBattleLog(attackResult); 
-    
-    await new Promise(resolve => setTimeout(resolve, 3500));
+    updateBattleLog(attackResult);
     
     if (currentDefender.stats.hp <= 0) {
+      // If any Pokemon reaches 0 HP, reveal the winner after 1 second
+      await new Promise(resolve => setTimeout(resolve, 1000));
       displayWinner(currentAttacker.name);
       break;
     }
 
+    await new Promise(resolve => setTimeout(resolve, 3500));
+    
+    // Switch attack and defender roles
     [currentAttacker, currentDefender] = [currentDefender, currentAttacker];
     currentAttacker.setRole("attack");
     currentDefender.setRole("defend");    
   } 
-}
+};
+
+//show button for starting battle and creating BatllePokemon
 let renderStartBattle = () => {
   const battleBtn = document.createElement("button");
   battleBtn.classList.add("btn","battle-btn" );

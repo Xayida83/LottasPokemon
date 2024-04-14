@@ -70,17 +70,17 @@ p {
   display: flex;
   flex-direction: column;
   
-  & p {
-    background: hsla(215, 48%, 39%);
-    padding: 0.5em;
-    border-radius: 1em 1em 0;
-  }
   & h3 {
     background: hsla(215, 48%, 39%);
     padding: 0.5em;
     border-radius: 1em 1em;
     text-align: center;
   }
+}
+.battle-log {
+  background: hsla(215, 48%, 39%);
+  padding: 0.5em;
+  border-radius: 1em 1em 0;
 }
 .reset-btn {
   align-self: center;
