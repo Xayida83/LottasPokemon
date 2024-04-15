@@ -271,15 +271,6 @@ let displayPokemon = (pokemon) => {
   cardContainer.appendChild(card);
 };
 
-// let updateBattleLog = (attackResult) => {
-//   const logElement = document.createElement('p');
-//   logElement.classList.add("battle-log");
-//   let attackerName = attackResult.attacker.toUpperCase();
-//   let attackMove = attackResult.move.toUpperCase();
-//   logElement.textContent = `${attackerName} used ${attackMove} and did ${attackResult.damage} damage. ${attackResult.opponentName} remaining HP: ${attackResult.remainingHp}`;
-//   battleTextWrap.appendChild(logElement); 
-// }
-
 let updateBattleLog = (attackResult) => {
   const logElement = document.createElement('p');
   logElement.classList.add("battle-log");
