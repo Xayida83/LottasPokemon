@@ -3,7 +3,8 @@ body {
   flex-direction: column;
   align-items: center;
   gap: 1em;
-  background-color: hsl(216, 53%, 19%);;
+  background-color: hsl(216, 53%, 19%);
+  margin: 2em 0;
 }
 h1, h2, h3, li {
   color: antiquewhite;
@@ -124,6 +125,7 @@ p {
     background: rgba(255, 255, 255, 0.144);
     padding: 2em;
     border-radius: 1em;
+    filter: brightness(1) contrast(1.2) saturate(1.2);
   }
 }
 .info {
@@ -162,7 +164,7 @@ p {
 @media (min-width: 1000px) {
   .comparison-container {
     position: fixed;
-    top: 8em;
+    top: 9em;
     font-size: 18px;
     max-width: 23em;
   }
@@ -171,7 +173,7 @@ p {
     top: 13em;
     overflow-y: auto;
     max-width: 22%;
-    max-height: 70%;
+    max-height: 65%;
     margin-top: 1em ;
     & p {
       margin: 0.1em;
