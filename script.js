@@ -241,7 +241,6 @@ let comparePokemons = (pokemon1, pokemon2) => {
   const categories = ['weight', 'height', ...Object.keys(pokemon1.stats)];
   //A "results" object is created to store the result of the comparisons for each category
   let results = {};
-  //By using the category names as keys in the results object, you can easily and directly retrieve the results for a specific comparison category. For example by referencing results['speed'].
 
   categories.forEach(category => {
     //if the value is in stats put value1 otherwise take the value for weght and height which is directly on the object and put as value1
@@ -304,7 +303,7 @@ let displayPokemon = (pokemon) => {
 let updateBattleLog = (attackResult) => {
   const logElement = document.createElement('p');
   logElement.classList.add("battle-log");
-
+  //Out of curiosity I choose to render the sentences in this way. made them span to be able to style them
   const logParts = [
       { text: attackResult.attacker, class: "attacker-name" },
       { text: "used", class: "text-normal" },
