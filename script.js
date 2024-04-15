@@ -15,16 +15,42 @@ class BattlePokemon extends Pokemon{
     this.moves = [];
   }
 
-  async fetchMoves(){
+  async fetchMoves() {
     try {
-      const data = await getData(`https://pokeapi.co/api/v2/pokemon/${this.id}`)
-      this.moves = data.moves.slice(0, 10).map(move => move.move.name)
-      if (this.moves.length === 0) {
-        console.error("No moves found for this Pokémon.");
-      }
+        const data = await getData(`https://pokeapi.co/api/v2/pokemon/${this.id}`);
+        const movesUrls = data.moves.slice(0, 10).map(move => move.move.url);
+
+        const movesDetailsPromises = movesUrls.map(url => 
+            getData(url).catch(err => {
+                console.error("Failed to fetch move details:", err);
+                return null; // Returnera null om ett specifikt anrop misslyckas
+            })
+        );
+
+        const movesDetails = await Promise.all(movesDetailsPromises);
+
+        this.moves = movesDetails.map(moveDetail => {
+            if (moveDetail && moveDetail.power) {
+                return {
+                    name: moveDetail.name,
+                    power: moveDetail.power                   
+                };                
+            } else {
+                // Sätt power till 10 om moveDetail saknas eller power inte är tillgänglig
+                return {
+                    name: moveDetail ? moveDetail.name : 'Unknown Move',
+                    power: 10
+                };
+            }
+        });
+
+        if (this.moves.length === 0) {
+            console.error("No moves found for this Pokémon.");
+        }
     } catch (error) {
-      console.error("Fail to fetch moves:", error);
+        console.error("Fail to fetch moves:", error);
     }
+    
   }
 
   setRole (role) {
@@ -40,14 +66,18 @@ class BattlePokemon extends Pokemon{
       console.error("No moves loaded. Cannot proceed with the attack.");
       return 0; 
     }
+    
     let randomIndex = Math.floor(Math.random() * this.moves.length);
     let selectedMove = this.moves[randomIndex];
-    let damage = (this.stats.attack + this.stats.specialAttack) -
-                  (opponent.stats.defense + opponent.stats.specialDefense) *0.8;
+    console.log(selectedMove.name, selectedMove.power);
+    
+    let damage = (this.stats.attack + selectedMove.power) -
+                  (opponent.stats.defense + opponent.stats.specialDefense) * 0.8;
     return {
-      move: selectedMove,
+      move: selectedMove.name,
       damage: damage < 10 ? 10 : Math.round(damage) //Ensure damage is min 10
     };
+    
   }
 
   attack(opponent) {
@@ -270,15 +300,6 @@ let displayPokemon = (pokemon) => {
   });
   cardContainer.appendChild(card);
 };
-
-// let updateBattleLog = (attackResult) => {
-//   const logElement = document.createElement('p');
-//   logElement.classList.add("battle-log");
-//   let attackerName = attackResult.attacker.toUpperCase();
-//   let attackMove = attackResult.move.toUpperCase();
-//   logElement.textContent = `${attackerName} used ${attackMove} and did ${attackResult.damage} damage. ${attackResult.opponentName} remaining HP: ${attackResult.remainingHp}`;
-//   battleTextWrap.appendChild(logElement); 
-// }
 
 let updateBattleLog = (attackResult) => {
   const logElement = document.createElement('p');

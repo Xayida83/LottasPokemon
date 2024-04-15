@@ -171,7 +171,7 @@ p {
     top: 13em;
     overflow-y: auto;
     max-width: 22%;
-    max-height: 70%;
+    max-height: 65%;
     margin-top: 1em ;
     & p {
       margin: 0.1em;
