@@ -342,6 +342,7 @@ let displayWinner = (winner) => {
   });
   battleTextWrap.appendChild(resetBtn);
 }
+let currentTimeout;
 
 let battle = async (pokemon1, pokemon2) => {
   //See which pokemon starts with an attack
@@ -357,12 +358,12 @@ let battle = async (pokemon1, pokemon2) => {
     
     if (currentDefender.stats.hp <= 0) {
       // If any Pokemon reaches 0 HP, reveal the winner after 1 second
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      await new Promise(resolve => currentTimeout = setTimeout(resolve, 1000));
       displayWinner(currentAttacker.name);
       break;
     }
 
-    await new Promise(resolve => setTimeout(resolve, 3500));
+    await new Promise(resolve => currentTimeout = setTimeout(resolve, 3500));
     
     // Switch attack and defender roles
     [currentAttacker, currentDefender] = [currentDefender, currentAttacker];
@@ -384,12 +385,14 @@ let renderStartBattle = () => {
     await Promise.all([battlePokemon1.fetchMoves(), battlePokemon2.fetchMoves()]);
 
     battle(battlePokemon1, battlePokemon2)
+    console.log(battlePokemon1, battlePokemon2);
   })
 
   battleContainer.append(battleBtn, battleTextWrap);
 }
 
 let restartBattle = () => {
+  clearTimeout(currentTimeout);
   battleTextWrap.innerHTML = ''; 
   battleContainer.innerHTML = ''; 
   comparisonContainer.innerHTML = ''; 
