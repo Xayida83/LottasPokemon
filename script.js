@@ -341,6 +341,7 @@ let displayWinner = (winner) => {
     location.reload();
   });
   battleTextWrap.appendChild(resetBtn);
+  hideButtons("remove-btn");
 }
 let currentTimeout;
 
@@ -401,3 +402,10 @@ let restartBattle = () => {
     card.classList.remove('attack', 'defend');
   });
  }
+
+ const hideButtons = (buttonClass) => {
+  const removeButtons = document.querySelectorAll(`.${buttonClass}`);
+  removeButtons.forEach(button => {
+      button.classList.add('hidden'); 
+  });
+};

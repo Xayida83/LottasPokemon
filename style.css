@@ -143,6 +143,9 @@ p {
   border: 2px solid blue;
   background-color: rgba(0, 0, 255, 0.1);
 }
+.hidden {
+  display: none;
+}
 
 @media (min-width: 800px) {
   .card-container {
