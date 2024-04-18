@@ -9,7 +9,26 @@ class Pokemon {
     this.stats = stats;
   }
 
-  static comparePokemons(pokemon1, pokemon2) {
+  static createPokemon(data) {
+    return new Pokemon(
+      data.id,
+      data.name,
+      data.sprites.other['showdown'].front_default,
+      data.types.map(typeInfo => typeInfo.type.name),
+      data.weight,
+      data.height,
+      {
+        hp: data.stats.find(stat => stat.stat.name === 'hp').base_stat,
+        attack: data.stats.find(stat => stat.stat.name === 'attack').base_stat,
+        specialAttack: data.stats.find(stat => stat.stat.name === 'special-attack').base_stat,
+        defense: data.stats.find(stat => stat.stat.name === 'defense').base_stat,
+        specialDefense: data.stats.find(stat => stat.stat.name === 'special-defense').base_stat,
+        speed: data.stats.find(stat => stat.stat.name === 'speed').base_stat,
+      }
+    );
+  }
+
+  static comparePokemons (pokemon1, pokemon2) {
     const categories = ['weight', 'height', ...Object.keys(pokemon1.stats)];
     let results = {};
 
@@ -41,7 +60,7 @@ class BattlePokemon extends Pokemon{
         const movesUrls = data.moves.slice(0, 10).map(move => move.move.url);
 
         const movesDetailsPromises = movesUrls.map(url => 
-            getData(url).catch(err => {
+            getData(url).catch(err => {               
                 console.error("Failed to fetch move details:", err);
                 return null; // Returnera null om ett specifikt anrop misslyckas
             })
@@ -69,6 +88,8 @@ class BattlePokemon extends Pokemon{
         }
     } catch (error) {
         console.error("Fail to fetch moves:", error);
+        alert("No moves loaded. Cannot proceed with the attack.")
+        restartBattle();
     }
     
   }
@@ -127,25 +148,6 @@ let getData = async (url) => {
     console.error(error);
   }
 }
-//Create object
-let createPokemon = (data) => {
-  return new Pokemon(
-    data.id,
-    data.name,
-    data.sprites.other['showdown'].front_default,
-    data.types.map(typeInfo => typeInfo.type.name),
-    data.weight,
-    data.height,
-    {
-      hp: data.stats.find(stat => stat.stat.name === 'hp').base_stat,
-      attack: data.stats.find(stat => stat.stat.name === 'attack').base_stat,
-      specialAttack: data.stats.find(stat => stat.stat.name === 'special-attack').base_stat,
-      defense: data.stats.find(stat => stat.stat.name === 'defense').base_stat,
-      specialDefense: data.stats.find(stat => stat.stat.name === 'special-defense').base_stat,
-      speed: data.stats.find(stat => stat.stat.name === 'speed').base_stat,
-    }
-  );
-}
 
 //Create Containers showing at loding document
 const comparisonContainer = document.createElement("div");
@@ -196,7 +198,7 @@ let fetchPokemonDetails = async (event) => {
   const url = event.target.value;
   try {
     const data = await getData(url);
-    const pokemon = createPokemon(data);
+    const pokemon = Pokemon.createPokemon(data);
 
     //Check if the pokemon already has been picked, show and push to array selectedPokemons 
     if (!selectedPokemons.find(p => p.name === pokemon.name)) {
@@ -255,29 +257,6 @@ let renderComparison = (pokemon1, pokemon2) => {
       resultText.textContent = "It is a tie!";
     }  
 }
-//Compare the selected pokemons
-// let comparePokemons = (pokemon1, pokemon2) => {
-//   //Saving weight and height in an array. Then with the spread-operatorn add the stats from the object
-//   const categories = ['weight', 'height', ...Object.keys(pokemon1.stats)];
-//   //A "results" object is created to store the result of the comparisons for each category
-//   let results = {};
-
-//   categories.forEach(category => {
-//     //if the value is in stats put value1 otherwise take the value for weght and height which is directly on the object and put as value1
-//     let value1 = category in pokemon1.stats ? pokemon1.stats[category] : pokemon1[category];
-//     let value2 = category in pokemon2.stats ? pokemon2.stats[category] : pokemon2[category];
-//     //Compare the values
-//     if (value1 > value2) {
-//       results[category] = 'pokemon1';
-//     } else if (value1 < value2) {
-//       results[category] = 'pokemon2';
-//     } else {
-//       results[category] = 'tie';
-//     }
-//   });
-
-//   return results;
-// }
 
 let displayPokemon = (pokemon) => {
   const card = document.createElement('div');
