@@ -8,6 +8,26 @@ class Pokemon {
     this.height = height;
     this.stats = stats;
   }
+
+  static comparePokemons(pokemon1, pokemon2) {
+    const categories = ['weight', 'height', ...Object.keys(pokemon1.stats)];
+    let results = {};
+
+    categories.forEach(category => {
+      let value1 = category in pokemon1.stats ? pokemon1.stats[category] : pokemon1[category];
+      let value2 = category in pokemon2.stats ? pokemon2.stats[category] : pokemon2[category];
+
+      if (value1 > value2) {
+        results[category] = 'pokemon1';
+      } else if (value1 < value2) {
+        results[category] = 'pokemon2';
+      } else {
+        results[category] = 'tie';
+      }
+    });
+
+    return results;
+  }
 }
 class BattlePokemon extends Pokemon{
   constructor(data) {
@@ -199,7 +219,7 @@ let fetchPokemonDetails = async (event) => {
 };
 
 let renderComparison = (pokemon1, pokemon2) => {
-  const comparisonResult = comparePokemons(pokemon1, pokemon2);
+  const comparisonResult = Pokemon.comparePokemons(pokemon1, pokemon2);
   console.log("Selected:", selectedPokemons);
   // Empty content from before
   comparisonContainer.innerHTML = '';
@@ -236,28 +256,28 @@ let renderComparison = (pokemon1, pokemon2) => {
     }  
 }
 //Compare the selected pokemons
-let comparePokemons = (pokemon1, pokemon2) => {
-  //Saving weight and height in an array. Then with the spread-operatorn add the stats from the object
-  const categories = ['weight', 'height', ...Object.keys(pokemon1.stats)];
-  //A "results" object is created to store the result of the comparisons for each category
-  let results = {};
+// let comparePokemons = (pokemon1, pokemon2) => {
+//   //Saving weight and height in an array. Then with the spread-operatorn add the stats from the object
+//   const categories = ['weight', 'height', ...Object.keys(pokemon1.stats)];
+//   //A "results" object is created to store the result of the comparisons for each category
+//   let results = {};
 
-  categories.forEach(category => {
-    //if the value is in stats put value1 otherwise take the value for weght and height which is directly on the object and put as value1
-    let value1 = category in pokemon1.stats ? pokemon1.stats[category] : pokemon1[category];
-    let value2 = category in pokemon2.stats ? pokemon2.stats[category] : pokemon2[category];
-    //Compare the values
-    if (value1 > value2) {
-      results[category] = 'pokemon1';
-    } else if (value1 < value2) {
-      results[category] = 'pokemon2';
-    } else {
-      results[category] = 'tie';
-    }
-  });
+//   categories.forEach(category => {
+//     //if the value is in stats put value1 otherwise take the value for weght and height which is directly on the object and put as value1
+//     let value1 = category in pokemon1.stats ? pokemon1.stats[category] : pokemon1[category];
+//     let value2 = category in pokemon2.stats ? pokemon2.stats[category] : pokemon2[category];
+//     //Compare the values
+//     if (value1 > value2) {
+//       results[category] = 'pokemon1';
+//     } else if (value1 < value2) {
+//       results[category] = 'pokemon2';
+//     } else {
+//       results[category] = 'tie';
+//     }
+//   });
 
-  return results;
-}
+//   return results;
+// }
 
 let displayPokemon = (pokemon) => {
   const card = document.createElement('div');
