@@ -2,7 +2,6 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 1em;
   background-color: hsl(216, 53%, 19%);
   margin: 2em 0;
 }
@@ -22,6 +21,9 @@ p {
   text-transform: capitalize;
   color: antiquewhite;
   margin: 0.5em;
+}
+.header{
+  max-width: 80%;
 }
 .btn {
   width: 8em;
@@ -167,16 +169,16 @@ p {
 @media (min-width: 1000px) {
   .comparison-container {
     position: fixed;
-    top: 9em;
+    top: 15em;
     font-size: 18px;
     max-width: 23em;
   }
   .battle-container{
     position: fixed;
-    top: 13em;
+    top: 20em;
     overflow-y: auto;
     max-width: 22%;
-    max-height: 65%;
+    max-height: 48%;
     margin-top: 1em ;
     & p {
       margin: 0.1em;

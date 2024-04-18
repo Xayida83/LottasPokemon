@@ -42,7 +42,7 @@ Detta system simulerar strider mellan två Pokémon. Användare kan välja två 
 
 ### `class BattlePokemon extends Pokemon`
 - Subklass till `Pokemon` som lägger till funktionalitet för strid, inklusive att hämta moves och beräkna skada.
- Varje BattlePokemon har sitt eget unika tillstånd, inklusive hp, som uppdateras oberoende av andra instanser. Detta gör att varje Pokémon kan ha sin egen hälsostatus som individuellt påverkas under striden.
+- Varje BattlePokemon har sitt eget unika tillstånd, inklusive hp, som uppdateras oberoende av andra instanser. Detta gör att varje Pokémon kan ha sin egen hälsostatus som individuellt påverkas under striden.
 
 ### `fetchMoves()`
 - Asynkron metod för att hämta moves från API. Använder Pokémonens ID för att göra API-anrop och lagrar upp till 10 moves med deras namn och power.
@@ -50,6 +50,6 @@ Detta system simulerar strider mellan två Pokémon. Användare kan välja två 
 ### `attack()`
 - Beräknar skadan baserat på en slumpmässigt vald move och motståndarens försvarsstatistik. Minskar motståndarens HP med den beräknade skadan.
 
-
 ## Användargränssnitt
-- Användargränssnittet inkluderar HTML-element och CSS-stylingför att visa Pokémon-kort och stridsmode.
+- Användargränssnittet inkluderar HTML-element och CSS-styling för att visa Pokémon-kort och striden. 
+- Mobile first och responsivt.
